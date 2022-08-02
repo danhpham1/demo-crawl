@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+// const puppeteer = require('puppeteer');
+// const fs = require('fs');
 
 (async () => {
     MAX_TIME_OUT = 999999999;
