@@ -31,7 +31,7 @@ const crawl = async () => {
         password:"Ao7xW3EEsm"
     });
     while (true) {
-        await delay(20000);
+        // await delay(20000);
         if (userInfo.data && userInfo.data.success == true) {
             const listMatchLivePromise =  axiosInstance.get(`http://www.isn99.com/membersite-api/api/data/events/1/3/0/7/3?_=${new Date().getTime()}`,{ headers: { Authorization:  `Bearer ${userInfo.data.token}`} });
             const listMatchTodayPromise =  axiosInstance.get(`http://www.isn99.com/membersite-api/api/data/events/1/2/0/7/3?_=${new Date().getTime()}`,{ headers: { Authorization:  `Bearer ${userInfo.data.token}`} });
@@ -73,7 +73,7 @@ const crawl = async () => {
                 temp = [...temp, ...matchOfleagues];
                 return temp;
             }, [])
-            fs.writeFileSync('data.json', JSON.stringify(listTransferDataMatch),'utf8');
+            fs.writeFileSync('isn99.json', JSON.stringify(listTransferDataMatch),'utf8');
             console.log('done')
         }
     }
