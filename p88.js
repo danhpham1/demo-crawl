@@ -44,91 +44,75 @@ const crawl = async () => {
             score: match[2][0][9] ? `${match[2][0][9][0]} - ${match[2][0][9][1]}` : null,
             time: match[2][0][16] || match[2][0][15] ? `${match[2][0][16]}${match[2][0][15]}` : null
         }
+        const hdp = [];
+        const ou = [];
+        if(match[2][0][8]["0"] && match[2][0][8]["0"][0]){
+            match[2][0][8]["0"][0].map(hdpValue => {
+                hdp.push({
+                    goal: hdpValue[2],
+                    oddhome: hdpValue[3],
+                    oddaway: hdpValue[4]
+                })
+            })
+        }
+        if(match[2][0][8]["0"] && match[2][0][8]["0"][1]){
+            match[2][0][8]["0"][1].map(hdpValue => {
+                ou.push({
+                    goal: hdpValue[2],
+                    oddhome: hdpValue[3],
+                    oddaway: hdpValue[4]
+                })
+            })
+        }
+        
         matchDetail['fullmatch'] = {
             "1X2": {
                 "1": match[2][0][8]["0"] && match[2][0][8]["0"][2] && match[2][0][8]["0"][2][1] ? match[2][0][8]["0"][2][1] : null,
                 "2": match[2][0][8]["0"] && match[2][0][8]["0"][2] && match[2][0][8]["0"][2][0] ? match[2][0][8]["0"][2][0] : null,
                 "x": match[2][0][8]["0"] && match[2][0][8]["0"][2] && match[2][0][8]["0"][2][2] ? match[2][0][8]["0"][2][2] : null,
             },
-            "hdp": [
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][0][0] && match[2][0][8]["0"][0][0][2] ? match[2][0][8]["0"][0][0][2] : null,
-                    oddhome: match[2][0][8]["0"] && match[2][0][8]["0"][0][0] && match[2][0][8]["0"][0][0][3] ? match[2][0][8]["0"][0][0][3] : null,
-                    oddaway: match[2][0][8]["0"] && match[2][0][8]["0"][0][0] && match[2][0][8]["0"][0][0][4] ? match[2][0][8]["0"][0][0][4] : null
-                },
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][0][1] && match[2][0][8]["0"][0][1][2] ? match[2][0][8]["0"][0][1][2] : null,
-                    oddhome: match[2][0][8]["0"] && match[2][0][8]["0"][0][1] && match[2][0][8]["0"][0][1][3] ? match[2][0][8]["0"][0][1][3] : null,
-                    oddaway: match[2][0][8]["0"] && match[2][0][8]["0"][0][1] && match[2][0][8]["0"][0][1][4] ? match[2][0][8]["0"][0][1][4] : null
-                },
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][0][2] && match[2][0][8]["0"][0][2][2] ? match[2][0][8]["0"][0][2][2] : null,
-                    oddhome: match[2][0][8]["0"] && match[2][0][8]["0"][0][2] && match[2][0][8]["0"][0][2][3] ? match[2][0][8]["0"][0][2][3] : null,
-                    oddaway: match[2][0][8]["0"] && match[2][0][8]["0"][0][2] && match[2][0][8]["0"][0][2][4] ? match[2][0][8]["0"][0][2][4] : null
-                }
-            ],
-            "ou": [
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][1][0] && match[2][0][8]["0"][1][0][2] ? match[2][0][8]["0"][1][0][2] : null,
-                    oddover: match[2][0][8]["0"] && match[2][0][8]["0"][1][0] && match[2][0][8]["0"][1][0][3] ? match[2][0][8]["0"][1][0][3] : null,
-                    oddunder: match[2][0][8]["0"] && match[2][0][8]["0"][1][0] && match[2][0][8]["0"][1][0][4] ? match[2][0][8]["0"][1][0][4] : null
-                },
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][1][1] && match[2][0][8]["0"][1][1][2] ? match[2][0][8]["0"][1][1][2] : null,
-                    oddover: match[2][0][8]["0"] && match[2][0][8]["0"][1][1] && match[2][0][8]["0"][1][1][3] ? match[2][0][8]["0"][1][1][3] : null,
-                    oddunder: match[2][0][8]["0"] && match[2][0][8]["0"][1][1] && match[2][0][8]["0"][1][1][4] ? match[2][0][8]["0"][1][1][4] : null
-                },
-                {
-                    goal: match[2][0][8]["0"] && match[2][0][8]["0"][1][2] && match[2][0][8]["0"][1][2][2] ? match[2][0][8]["0"][1][2][2] : null,
-                    oddover: match[2][0][8]["0"] && match[2][0][8]["0"][1][2] && match[2][0][8]["0"][1][2][3] ? match[2][0][8]["0"][1][2][3] : null,
-                    oddunder: match[2][0][8]["0"] && match[2][0][8]["0"][1][2] && match[2][0][8]["0"][1][2][4] ? match[2][0][8]["0"][1][2][4] : null
-                }
-            ]
         }
+        matchDetail['fullmatch']['hdp'] = hdp;
+        matchDetail['fullmatch']['ou'] = ou;
+
+        const hdpFirstMatch = [];
+        const ouFirstMatch = [];
+
+        if(match[2][0][8]["1"] && match[2][0][8]["1"][0]){
+            match[2][0][8]["1"][0].map(hdpValue => {
+                hdpFirstMatch.push({
+                    goal: hdpValue[2],
+                    oddhome: hdpValue[3],
+                    oddaway: hdpValue[4]
+                })
+            })
+        }
+        if(match[2][0][8]["1"] && match[2][0][8]["1"][1]){
+            match[2][0][8]["1"][1].map(hdpValue => {
+                ouFirstMatch.push({
+                    goal: hdpValue[2],
+                    oddhome: hdpValue[3],
+                    oddaway: hdpValue[4]
+                })
+            })
+        }
+
         matchDetail['firstmatch'] = {
             "1X2": {
                 "1": match[2][0][8]["1"] && match[2][0][8]["1"][2] && match[2][0][8]["1"][2][1] ? match[2][0][8]["1"][2][1] : null,
                 "2": match[2][0][8]["1"] && match[2][0][8]["1"][2] && match[2][0][8]["1"][2][0] ? match[2][0][8]["1"][2][0] : null,
                 "x": match[2][0][8]["1"] && match[2][0][8]["1"][2] && match[2][0][8]["1"][2][2] ? match[2][0][8]["1"][2][2] : null,
             },
-            "hdp": [
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][0][0] && match[2][0][8]["1"][0][0][2] ? match[2][0][8]["1"][0][0][2] : null,
-                    oddhome: match[2][0][8]["1"] && match[2][0][8]["1"][0][0] && match[2][0][8]["1"][0][0][3] ? match[2][0][8]["1"][0][0][3] : null,
-                    oddaway: match[2][0][8]["1"] && match[2][0][8]["1"][0][0] && match[2][0][8]["1"][0][0][4] ? match[2][0][8]["1"][0][0][4] : null
-                },
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][0][1] && match[2][0][8]["1"][0][1][2] ? match[2][0][8]["1"][0][1][2] : null,
-                    oddhome: match[2][0][8]["1"] && match[2][0][8]["1"][0][1] && match[2][0][8]["1"][0][1][3] ? match[2][0][8]["1"][0][1][3] : null,
-                    oddaway: match[2][0][8]["1"] && match[2][0][8]["1"][0][1] && match[2][0][8]["1"][0][1][4] ? match[2][0][8]["1"][0][1][4] : null
-                },
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][0][2] && match[2][0][8]["1"][0][2][2] ? match[2][0][8]["1"][0][2][2] : null,
-                    oddhome: match[2][0][8]["1"] && match[2][0][8]["1"][0][2] && match[2][0][8]["1"][0][2][3] ? match[2][0][8]["1"][0][2][3] : null,
-                    oddaway: match[2][0][8]["1"] && match[2][0][8]["1"][0][2] && match[2][0][8]["1"][0][2][4] ? match[2][0][8]["1"][0][2][4] : null
-                }
-            ],
-            "ou": [
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][1][0] && match[2][0][8]["1"][1][0][2] ? match[2][0][8]["1"][1][0][2] : null,
-                    oddover: match[2][0][8]["1"] && match[2][0][8]["1"][1][0] && match[2][0][8]["1"][1][0][3] ? match[2][0][8]["1"][1][0][3] : null,
-                    oddunder: match[2][0][8]["1"] && match[2][0][8]["1"][1][0] && match[2][0][8]["1"][1][0][4] ? match[2][0][8]["1"][1][0][4] : null
-                },
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][1][1] && match[2][0][8]["1"][1][1][2] ? match[2][0][8]["1"][1][1][2] : null,
-                    oddover: match[2][0][8]["1"] && match[2][0][8]["1"][1][1] && match[2][0][8]["1"][1][1][3] ? match[2][0][8]["1"][1][1][3] : null,
-                    oddunder: match[2][0][8]["1"] && match[2][0][8]["1"][1][1] && match[2][0][8]["1"][1][1][4] ? match[2][0][8]["1"][1][1][4] : null
-                },
-                {
-                    goal: match[2][0][8]["1"] && match[2][0][8]["1"][1][2] && match[2][0][8]["1"][1][2][2] ? match[2][0][8]["1"][1][2][2] : null,
-                    oddover: match[2][0][8]["1"] && match[2][0][8]["1"][1][2] && match[2][0][8]["1"][1][2][3] ? match[2][0][8]["1"][1][2][3] : null,
-                    oddunder: match[2][0][8]["1"] && match[2][0][8]["1"][1][2] && match[2][0][8]["1"][1][2][4] ? match[2][0][8]["1"][1][2][4] : null
-                }
-            ]
         }
+
+        matchDetail['firstmatch']['hdp'] = hdpFirstMatch;
+        matchDetail['firstmatch']['ou'] = ouFirstMatch;
+
         totalMatch.push(matchDetail);
     });
+
     fs.writeFileSync('p88.json',JSON.stringify(totalMatch),'utf8');
+    
     console.log('Done');
 }
 
