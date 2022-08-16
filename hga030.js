@@ -79,87 +79,88 @@ const crawl = async () => {
     const paramsLogin = getBodyParamsLogin();
     const userInfo = await axiosInstance.post('https://hga030.com/transform.php?ver=_EN1-3ed5-SP-0721-94881ae5576be7', paramsLogin);
     const userParseToJson = await parseStringPromise(userInfo.data, { trim: true, explicitArray: false });
-    // while (true) {
-    // await delay(1000);
-    if (userParseToJson && userParseToJson.serverresponse.status == 200) {
-        const uid = userParseToJson.serverresponse.uid;
-        const paramsGameList = getBodyGameList(uid);
-        const gameLists = await axiosInstance.post('https://hga030.com/transform.php?ver=_EN1-3ed5-SP-0721-94881ae5576be7', paramsGameList);
-        const gameListToJson = await parseStringPromise(gameLists.data, { trim: true, explicitArray: false });
-        if (!gameListToJson.serverresponse.system_time) {
-            throw new Error('Not found system_time')
-        }
-        if (gameListToJson.serverresponse.ec && gameListToJson.serverresponse.ec.length >= 1) {
-            const totalMatch = [];
-            gameListToJson.serverresponse.ec.map(match => {
-                const matchInfo = {};
-                matchInfo['infomatch'] = {
-                    namehome: match.game.TEAM_H ? match.game.TEAM_H : null,
-                    nameaway: match.game.TEAM_C ? match.game.TEAM_C : null,
-                    score: match.game.SCORE_H && match.game.SCORE_C ? match.game.SCORE_H + '-' + match.game.SCORE_C : null,
-                    time: match.game.RETIMESET ? match.game.RETIMESET : null
-                }
+    while (true) {
+        await delay(1000);
+        if (userParseToJson && userParseToJson.serverresponse.status == 200) {
+            const uid = userParseToJson.serverresponse.uid;
+            const paramsGameList = getBodyGameList(uid);
+            const gameLists = await axiosInstance.post('https://hga030.com/transform.php?ver=_EN1-3ed5-SP-0721-94881ae5576be7', paramsGameList);
+            const gameListToJson = await parseStringPromise(gameLists.data, { trim: true, explicitArray: false });
+            if (!gameListToJson.serverresponse.system_time) {
+                throw new Error('Not found system_time')
+            }
+            if (gameListToJson.serverresponse.ec && gameListToJson.serverresponse.ec.length >= 1) {
+                const totalMatch = [];
+                gameListToJson.serverresponse.ec.map(match => {
+                    const matchInfo = {};
+                    matchInfo['infomatch'] = {
+                        namehome: match.game.TEAM_H ? match.game.TEAM_H : null,
+                        nameaway: match.game.TEAM_C ? match.game.TEAM_C : null,
+                        score: match.game.SCORE_H && match.game.SCORE_C ? match.game.SCORE_H + '-' + match.game.SCORE_C : null,
+                        time: match.game.RETIMESET ? match.game.RETIMESET : null
+                    }
 
-                matchInfo['fullmatch'] = {};
-                matchInfo['fullmatch']['1X2'] = {};
-                matchInfo['fullmatch']['hdp'] = [];
-                matchInfo['fullmatch']['ou'] = [];
+                    matchInfo['fullmatch'] = {};
+                    matchInfo['fullmatch']['1X2'] = {};
+                    matchInfo['fullmatch']['hdp'] = [];
+                    matchInfo['fullmatch']['ou'] = [];
 
-                matchInfo['firstmatch'] = {};
-                matchInfo['firstmatch']['1X2'] = {};
-                matchInfo['firstmatch']['hdp'] = [];
-                matchInfo['firstmatch']['ou'] = [];
+                    matchInfo['firstmatch'] = {};
+                    matchInfo['firstmatch']['1X2'] = {};
+                    matchInfo['firstmatch']['hdp'] = [];
+                    matchInfo['firstmatch']['ou'] = [];
 
-                matchInfo['fullmatch']['1X2'] = {
-                    '1': match.game.IOR_RMH ? match.game.IOR_RMH : null,
-                    '2': match.game.IOR_RMC ? match.game.IOR_RMC : null,
-                    'X': match.game.IOR_RMN ? match.game.IOR_RMN : null
-                }
+                    matchInfo['fullmatch']['1X2'] = {
+                        '1': match.game.IOR_RMH ? match.game.IOR_RMH : null,
+                        '2': match.game.IOR_RMC ? match.game.IOR_RMC : null,
+                        'X': match.game.IOR_RMN ? match.game.IOR_RMN : null
+                    }
 
-                matchInfo['fullmatch']['hdp'].push({
-                    goal: match.game.RATIO_RE ? match.game.RATIO_RE : null,
-                    oddhome: match.game.IOR_REH ? match.game.IOR_REH : null,
-                    oddaway: match.game.IOR_REC ? match.game.IOR_REC : null,
+                    matchInfo['fullmatch']['hdp'].push({
+                        goal: match.game.RATIO_RE ? match.game.RATIO_RE : null,
+                        oddhome: match.game.IOR_REH ? match.game.IOR_REH : null,
+                        oddaway: match.game.IOR_REC ? match.game.IOR_REC : null,
+                    })
+
+                    matchInfo['fullmatch']['ou'].push({
+                        goal: match.game.RATIO_ROUO ? match.game.RATIO_ROUO.replace('O', '').trim() : null,
+                        oddhome: match.game.IOR_ROUH ? match.game.IOR_ROUH : null,
+                        oddaway: match.game.IOR_ROUC ? match.game.IOR_ROUC : null,
+                    })
+
+                    matchInfo['firstmatch']['1X2'] = {
+                        '1': match.game.IOR_HRMH ? match.game.IOR_HRMH : null,
+                        '2': match.game.IOR_HRMC ? match.game.IOR_HRMC : null,
+                        'X': match.game.IOR_HRMN ? match.game.IOR_HRMN : null
+                    }
+
+                    matchInfo['firstmatch']['hdp'].push({
+                        goal: match.game.RATIO_HRE ? match.game.RATIO_HRE : null,
+                        oddhome: match.game.IOR_HREH ? match.game.IOR_HREH : null,
+                        oddaway: match.game.IOR_HREC ? match.game.IOR_HREC : null,
+                    })
+
+                    matchInfo['firstmatch']['ou'].push({
+                        goal: match.game.RATIO_HROUO ? match.game.RATIO_HROUO.replace('O', '').trim() : null,
+                        oddhome: match.game.IOR_HROUH ? match.game.IOR_HROUH : null,
+                        oddaway: match.game.IOR_HROUC ? match.game.IOR_HROUC : null,
+                    })
+
+                    totalMatch.push(matchInfo);
                 })
-
-                matchInfo['fullmatch']['ou'].push({
-                    goal: match.game.RATIO_ROUO ? match.game.RATIO_ROUO.replace('O','').trim() : null,
-                    oddhome: match.game.IOR_ROUH ? match.game.IOR_ROUH : null,
-                    oddaway: match.game.IOR_ROUC ? match.game.IOR_ROUC : null,
-                })
-
-                matchInfo['firstmatch']['1X2'] = {
-                    '1': match.game.IOR_HRMH ? match.game.IOR_HRMH : null,
-                    '2': match.game.IOR_HRMC ? match.game.IOR_HRMC : null,
-                    'X': match.game.IOR_HRMN ? match.game.IOR_HRMN : null
-                }
-
-                matchInfo['firstmatch']['hdp'].push({
-                    goal: match.game.RATIO_HRE ? match.game.RATIO_HRE : null,
-                    oddhome: match.game.IOR_HREH ? match.game.IOR_HREH : null,
-                    oddaway: match.game.IOR_HREC ? match.game.IOR_HREC : null,
-                })
-
-                matchInfo['firstmatch']['ou'].push({
-                    goal: match.game.RATIO_HROUO ? match.game.RATIO_HROUO.replace('O','').trim() : null,
-                    oddhome: match.game.IOR_HROUH ? match.game.IOR_HROUH : null,
-                    oddaway: match.game.IOR_HROUC ? match.game.IOR_HROUC : null,
-                })
-
-                totalMatch.push(matchInfo);
-            })
-            fs.writeFileSync("hga030.json", JSON.stringify(totalMatch))
-            console.log("Done");
+                fs.writeFileSync("hga030.json", JSON.stringify(totalMatch))
+                console.log("Done");
+            }
         }
     }
-    // }
 }
 
 const runCrawl = async () => {
     try {
         await crawl();
     } catch (error) {
-        // runCrawl();
+        console.log(error);
+        runCrawl();
     }
 }
 
