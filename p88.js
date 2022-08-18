@@ -1,19 +1,7 @@
 import axios from "axios";
 import mongoose from "mongoose";
 import fs from 'fs';
-
-const connectMongo = async () => {
-    try {
-        await mongoose.connect("mongodb+srv://danh:hanhphucao@clusterblog.sbxju.mongodb.net/gamelist?retryWrites=true&w=majority",
-            {
-                useNewUrlParser: true,
-            },
-        )
-        console.log("connected");
-    } catch (error) {
-        console.log(error);
-    }
-}
+import { connectMongo, insertData } from "./mongdb.js";
 
 const getAxiosInstance = () => {
     return axios.create({});
@@ -25,8 +13,14 @@ const delay = (time) => {
 
 const crawl = async () => {
     const axiosInstance = getAxiosInstance();
+    await connectMongo();
+    let isFirst = true;
     while (true) {
-        await delay(20000);
+        if(!isFirst){
+            await delay(20000);
+        } else {
+            isFirst = false;
+        }
         const allListMatchApi = await axiosInstance.get(`https://www.p88.bet/sports-service/sv/compact/events?_g=0&btg=1&c=&cl=3&d=&ev=&g=&hle=false&inl=false&l=3&lg=&lv=&me=0&mk=1&more=false&o=1&ot=1&pa=0&pn=-1&sp=29&tm=0&v=0&wm=&locale=en_US&_=${new Date().getTime()}&withCredentials=true`)
         let listMergeMap = [];
         if (allListMatchApi.data.l && allListMatchApi.data.l[0][2].length >= 1) {
@@ -110,10 +104,8 @@ const crawl = async () => {
 
             totalMatch.push(matchDetail);
         });
-
-        fs.writeFileSync('p88.json', JSON.stringify(totalMatch), 'utf8');
-
-        console.log('Done');
+        await insertData(totalMatch);
+        console.log('done');
     }
 }
 

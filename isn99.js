@@ -2,19 +2,7 @@ import axios from "axios";
 import { parseStringPromise } from "xml2js";
 import mongoose from "mongoose";
 import fs from 'fs';
-
-const connectMongo = async () => {
-    try {
-        await mongoose.connect("mongodb+srv://danh:hanhphucao@clusterblog.sbxju.mongodb.net/gamelist?retryWrites=true&w=majority",
-            {
-                useNewUrlParser: true,
-            },
-        )
-        console.log("connected");
-    } catch (error) {
-        console.log(error);
-    }
-}
+import { connectMongo, insertData } from "./mongdb.js";
 
 const getAxiosInstance = () => {
     return axios.create({});
@@ -30,8 +18,14 @@ const crawl = async () => {
         username: "IW8866",
         password: "Ao7xW3EEsm"
     });
+    let isFirst = true;
+    await connectMongo();
     while (true) {
-        await delay(20000);
+        if(!isFirst){
+            await delay(20000);
+        } else {
+            isFirst = false;
+        }
         if (userInfo.data && userInfo.data.success == true) {
             const listMatchLivePromise = axiosInstance.get(`http://www.isn99.com/membersite-api/api/data/events/1/3/0/7/3?_=${new Date().getTime()}`, { headers: { Authorization: `Bearer ${userInfo.data.token}` } });
             const listMatchTodayPromise = axiosInstance.get(`http://www.isn99.com/membersite-api/api/data/events/1/2/0/7/3?_=${new Date().getTime()}`, { headers: { Authorization: `Bearer ${userInfo.data.token}` } });
@@ -113,8 +107,8 @@ const crawl = async () => {
                     infoAllMatch.push(infoMatch);
                 })
             })
-            fs.writeFileSync('isn99.json', JSON.stringify(infoAllMatch), 'utf8');
-            console.log('done')
+            insertData(infoAllMatch);
+            console.log("Done");
         }
     }
 }

@@ -2,19 +2,7 @@ import axios from "axios";
 import { parseStringPromise } from "xml2js";
 import mongoose from "mongoose";
 import fs from 'fs';
-
-const connectMongo = async () => {
-    try {
-        await mongoose.connect("mongodb+srv://danh:hanhphucao@clusterblog.sbxju.mongodb.net/gamelist?retryWrites=true&w=majority",
-            {
-                useNewUrlParser: true,
-            },
-        )
-        console.log("connected");
-    } catch (error) {
-        console.log(error);
-    }
-}
+import { connectMongo, insertData } from "./mongdb.js";
 
 const getAxiosInstance = () => {
     return axios.create({
@@ -54,7 +42,7 @@ const getBodyParamsLogin = () => {
 const getBodyGameList = (uid) => {
     const params = new URLSearchParams();
     params.append('uid', uid),
-        params.append('ver', '_EN1-3ed5-SP-0721-94881ae5576be7');
+    params.append('ver', '_EN1-3ed5-SP-0721-94881ae5576be7');
     params.append('langx', 'en-us');
     params.append('p', 'get_game_list');
     params.append('p3type', '');
@@ -75,12 +63,18 @@ const delay = (time) => {
 }
 
 const crawl = async () => {
+    await connectMongo()
     const axiosInstance = getAxiosInstance();
     const paramsLogin = getBodyParamsLogin();
     const userInfo = await axiosInstance.post('https://hga030.com/transform.php?ver=_EN1-3ed5-SP-0721-94881ae5576be7', paramsLogin);
     const userParseToJson = await parseStringPromise(userInfo.data, { trim: true, explicitArray: false });
+    let isFirst = true;
     while (true) {
-        await delay(1000);
+        if( !isFirst ){
+            await delay(1000);
+        } else {
+            isFirst = false;
+        }
         if (userParseToJson && userParseToJson.serverresponse.status == 200) {
             const uid = userParseToJson.serverresponse.uid;
             const paramsGameList = getBodyGameList(uid);
@@ -148,7 +142,7 @@ const crawl = async () => {
 
                     totalMatch.push(matchInfo);
                 })
-                fs.writeFileSync("hga030.json", JSON.stringify(totalMatch))
+                insertData(totalMatch);
                 console.log("Done");
             }
         }
